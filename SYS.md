@@ -56,3 +56,8 @@ Flags
 2. O_WRONLY  → open for writing  
 3. O_TRUNC   → clear file if already exists  
 4. O_APPEND
+
+### Process
+1. fork - create child
+2. wait - parent wait
+3. exec - run command
