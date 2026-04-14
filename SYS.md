@@ -40,7 +40,19 @@ free(p);
 
 - memory still exists but cant access it - leak
 
-```c
-int *p = malloc(sizeof(int));
-p = NULL;   // ❌ lost reference
-```
+  ```c
+  int *p = malloc(sizeof(int));
+  p = NULL;   // ❌ lost reference
+  ```
+
+  System Calls
+
+  A system call is how program talks to OS
+
+  code -> sys call -> os(kernel mode) -> hardware
+
+Flags
+1. O_CREAT   → create file if not exists  
+2. O_WRONLY  → open for writing  
+3. O_TRUNC   → clear file if already exists  
+4. O_APPEND
