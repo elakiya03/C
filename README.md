@@ -50,6 +50,7 @@ Without `\n`, both texts would appear on the same line.
 ASCII value
 
 ### Keywords
+
 1. break
 2. switch
 3. default
@@ -145,6 +146,11 @@ for(expression1; expression2; expression3){}
 
 - skip this round but keep looping
 
+# switch
+
+- allowed types are `int`,`char` and `enum`
+- default not nessarily need `break`. but recommended.
+
 ### escape characters
 
 1. \n
@@ -170,6 +176,16 @@ gets(name,sizeof(name),stdin);
 ```
 
 - Remember that strings in C are actually an array of characters, and unfortunately, you can't assign a value to an array like this:
+
+1. strcpy
+2. strcat
+3. strcmp
+4. strcspn
+
+### Maths
+
+1. abs()
+2. round()
 
 ### Pointers
 
