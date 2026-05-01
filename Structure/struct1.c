@@ -5,7 +5,7 @@ struct team
     char name[100];
     int score;
     char *name_;
-};
+} t1, t2; // one structure multiple variable
 
 int main()
 {
@@ -19,5 +19,8 @@ int main()
 
     printf("Player name: %s\n", m1.name);
     printf("%s score: %d\n", m1.name_, m1.score);
+
+    t1.name;
+
     return 0;
 }
