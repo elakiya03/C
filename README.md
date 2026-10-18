@@ -346,6 +346,8 @@ printf("%d\n", funcPtr(5, 2));
 ### Arrays
 
 ```c
+int arr[10];
+int arr[] = {1, 2, 3, 4, 5};
 int arr[5] = {1, 2, 3, 4, 5};
 ```
 
@@ -354,13 +356,20 @@ int arr[5] = {1, 2, 3, 4, 5};
 - Valid indices: `0` to `size-1`.
 - Out-of-bounds access is undefined.
 
+Arrays with static storage duration, such as a static array or a file-scope array, are initialized to zero if no explicit initializer is provided. Otherwise, local arrays contain garbage values.
+
+Accessing elements outside of array bounds leads to undefined behaviour. The program may crash, produce garbage values, memory corruption...
+
+When partially initializing array, the remaining elements are automatically set to zero.
+
 ### Multidimensional Arrays
 
 ```c
 int matrix[3][4];
 ```
 
-- Stored in row-major order.
+- C supports 2D and 3D arrays.
+-  Stored in row-major order.
 - Access with `matrix[i][j]`.
 
 ### Passing Arrays to Functions
