@@ -329,7 +329,7 @@ for (int i = 0; i < 10; i++) {
 }
 ```
 
-####  `for` Loop Patterns
+#### `for` Loop Patterns
 
 C has one `for` statement form: `for (initialization; condition; update)`. Any of its three expressions can be omitted, and these examples show common ways to use that form:
 
@@ -609,25 +609,52 @@ static inline int square(int value) {
 
 ### Arrays
 
-```c
-int arr[5];                  // Fixed size; elements are uninitialized
-int a[5] = {1, 2, 3, 4, 5}; // Initialize every element
-int b[] = {1, 2, 3};         // Size is inferred as 3
-int c[5] = {1, 2};           // Remaining elements are initialized to 0
-int d[5] = {0};              // Initialize every element to 0
-int e[] = {0};               // One element, with value 0
-```
-
 - A fixed-size array has its size determined at its declaration.
 - The array name decays to a pointer to the first element.
 - Valid indices: `0` to `size - 1`.
 - Out-of-bounds access is undefined.
-
 - Arrays with static storage duration, such as a static array or a file-scope array, are initialized to zero if no explicit initializer is provided. Otherwise, local arrays contain garbage values.
-
-- Accessing elements outside of array bounds leads to undefined behaviour. The program may crash, produce garbage values, memory corruption...
-
+- `Accessing elements outside of array bounds leads to undefined behaviour.` The program may crash, produce garbage values, memory corruption...
 - When partially initializing array, the remaining elements are automatically set to zero.
+
+### Integer Arrays
+
+An integer array stores values of type `int` in contiguous elements:
+
+```c
+int numbers[5];                  // Fixed size; elements are uninitialized
+int scores[5] = {10, 20, 30, 40, 50};
+int first_values[] = {1, 2, 3};  // Size is inferred as 3
+int partial[5] = {1, 2};         // Remaining elements are initialized to 0
+int all_zero[5] = {0};           // Initialize every element to 0
+```
+
+### Character Arrays and Strings
+
+A character array stores `char` values. A C string is a character array terminated by `'\0'`; leave room for that terminator when initializing or filling the array.
+
+```c
+char letters[] = {'C', ' ', 'C', '+', '+'}; // Character array, not a C string
+char greeting[] = "Hello";                   // String; includes the terminating '\0'
+char name[20] = "Alice";                     // Room for up to 19 characters plus '\0'
+char empty_string[] = "";                    // Empty string: one '\0' character
+char empty_buffer[20] = "";                   // Writable buffer initially containing an empty string
+```
+
+A zero-length array such as `char empty[0]` is not permitted by standard C. Use `char empty_string[] = "";` for an empty string, or a nonzero-sized buffer initialized to `""` when you need room to add characters later.
+
+### Arrays of String Pointers
+
+An array of string pointers stores pointers to strings, rather than placing all the string characters in one fixed-size two-dimensional array. Use `const char *` for string literals, which must not be modified:
+
+```c
+const char *fruits[] = {"Apple", "Banana", "Cherry"};
+size_t fruit_count = sizeof fruits / sizeof fruits[0];
+
+for (size_t i = 0; i < fruit_count; i++) {
+    printf("%s\n", fruits[i]);
+}
+```
 
 ### Multidimensional Arrays
 
@@ -635,38 +662,143 @@ int e[] = {0};               // One element, with value 0
 int matrix[3][4];
 ```
 
-- C supports 2D and 3D arrays.
+- C supports 2D and 3D arrays and etc..
 - Stored in row-major order.
 - Access with `matrix[i][j]`.
 
 ### Passing Arrays to Functions
 
-- When you pass an array to a function, it is treated as a pointer to its first element.
-- Changes made through that pointer inside the function affect the original array values.
-- Example:
+- In a function parameter, `int values[]` is adjusted to `int *values`, a pointer to the first element. The function does not receive the array's length; pass it separately, usually as `size_t`.
+- Changes made through a pointer parameter affect the original array elements.
 
-  ```c
-  void set_zero(int arr[], int n) {
-      for (int i = 0; i < n; i++) {
-          arr[i] = 0;
-      }
-  }
+```c
+#include <stddef.h>
 
-  int main(void) {
-      int data[3] = {1, 2, 3};
-      set_zero(data, 3);
-      // data is now {0, 0, 0}
-  }
-  ```
+void set_zero(int values[], size_t count) {
+    for (size_t i = 0; i < count; i++) {
+        values[i] = 0;
+    }
+}
+```
 
-### Strings
+Strings are passed as `char *` (or `const char *` when the function only reads them). A null terminator lets a function find the end of a valid string, but the destination buffer capacity must still be tracked when writing.
 
-- Strings are `char` arrays terminated with `\0`.
-- Example:
-  ```c
-  char name[20] = "Alice";
-  ```
-- Always reserve space for the null terminator.
+### Printing Arrays in Functions
+
+Pass an array and its element count to a function. Use `%d` for each `int`, `%c` for individual characters, `%s` for a null-terminated string, and `%s` for each string in an array of string pointers:
+
+```c
+#include <stddef.h>
+#include <stdio.h>
+
+void print_ints(const int values[], size_t count) {
+    for (size_t i = 0; i < count; i++) {
+        printf("%d ", values[i]);
+    }
+    putchar('\n');
+}
+
+void print_chars(const char characters[], size_t count) {
+    for (size_t i = 0; i < count; i++) {
+        putchar(characters[i]);
+    }
+    putchar('\n');
+}
+
+void print_string(const char text[]) {
+    puts(text);
+}
+
+void print_strings(const char *const strings[], size_t count) {
+    for (size_t i = 0; i < count; i++) {
+        puts(strings[i]);
+    }
+}
+
+int main(void) {
+    int numbers[] = {10, 20, 30};
+    char letters[] = {'C', ' ', '!'};
+    char message[] = "Hello";
+    const char *fruits[] = {"Apple", "Banana", "Cherry"};
+
+    print_ints(numbers, sizeof numbers / sizeof numbers[0]);
+    print_chars(letters, sizeof letters / sizeof letters[0]);
+    print_string(message);
+    print_strings(fruits, sizeof fruits / sizeof fruits[0]);
+    return 0;
+}
+```
+
+### Returning Array Data from Functions
+
+A C function cannot return an array by value. It can return a pointer to the first element, but the pointed-to memory must remain valid after the function returns. Common pointer return types are:
+
+| Data returned            | Pointer return type                                              | Important detail                                                                              |
+| ------------------------ | ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Integer array            | `int *`                                                          | Return dynamically allocated memory or another array with a sufficient lifetime.              |
+| Modifiable string        | `char *`                                                         | The returned character storage must remain alive and writable if the caller will modify it.   |
+| Read-only string         | `const char *`                                                   | Suitable for returning a string literal or other read-only string with a sufficient lifetime. |
+| Array of string pointers | `const char **` (or `const char *const *` for read-only entries) | Points to read-only strings; the pointer array itself must also remain alive.                 |
+
+For example, an integer array can be dynamically allocated and returned as `int *`. The caller owns the allocation and must check for failure and release it with `free()`:
+
+```c
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
+
+int *create_numbers(size_t count) {
+    if (count > SIZE_MAX / sizeof(int)) {
+        return NULL;
+    }
+
+    int *values = malloc(count * sizeof *values);
+    if (values == NULL) {
+        return NULL;
+    }
+
+    for (size_t i = 0; i < count; i++) {
+        values[i] = 0;
+    }
+    return values;
+}
+```
+
+For a dynamically allocated, modifiable string, return `char *`; the caller must free the returned memory. A `const char *` can instead refer to a string literal that remains valid for the program's lifetime:
+
+```c
+#include <stdlib.h>
+#include <string.h>
+
+char *create_message(void) {
+    const char text[] = "Hello";
+    char *copy = malloc(sizeof text);
+    if (copy == NULL) {
+        return NULL;
+    }
+    memcpy(copy, text, sizeof text);
+    return copy;
+}
+
+const char *get_message(void) {
+    return "Hello";
+}
+```
+
+For arrays of string pointers, a function can return a pointer to a `static` array; the caller can read its entries but must not free or modify them:
+
+```c
+#include <stddef.h>
+
+// count must point to a valid size_t object.
+const char *const *get_fruits(size_t *count) {
+    static const char *const fruits[] = {"Apple", "Banana", "Cherry"};
+    *count = sizeof fruits / sizeof fruits[0];
+    return fruits;
+}
+```
+
+Do not return a pointer to a local, non-static array. For dynamically allocated return values, document who owns the memory and who must free it. Alternatively, let the caller provide an output array and its capacity.
 
 ### Input with `scanf`
 
@@ -731,12 +863,17 @@ int **pp = &p;
   int *p = NULL;
   ```
 - **Void pointer:** a generic pointer that can hold any object address.
+
   ```c
   void *p;
   int x = 10;
   p = &x;
   int *ip = (int *)p;
   ```
+
+- `void *` can point to any object type.
+- Cast back to the correct pointer type before dereferencing.
+
 - **Pointer to const:** points to data that should not be changed through this pointer.
   ```c
   const int *p = &x;
@@ -760,18 +897,6 @@ int **pp = &p;
   - pointer to struct (`struct Point *`)
   - pointer to array element (`int (*arr)[10]`)
   - pointer to pointer (`int **`)
-
-### Void Pointers
-
-```c
-void *p;
-int x = 10;
-p = &x;
-int *ip = (int *)p;
-```
-
-- `void *` can point to any object type.
-- Cast back to the correct pointer type before dereferencing.
 
 ### Common Pointer Mistakes
 
@@ -1181,15 +1306,15 @@ int main(void) {
 
 C does not require one naming style for identifiers or files. Follow the conventions already used by a project; when starting a project, choose a consistent style. A common C style is:
 
-| Item | Common convention | Examples |
-|---|---|---|
-| Source and header files | `snake_case` or `flatcase`; choose one and use it consistently | `array_utils.c`, `arrayutils.h` |
-| Folders | `flatcase` | `src/`, `systemprogramming/` |
-| Variables | `snake_case` | `item_count`, `buffer_size` |
-| Functions | `snake_case` | `read_file()`, `calculate_total()` |
-| Constants and macros | `UPPER_CASE`, with underscores between words | `MAX_BUFFER_SIZE`, `PI` |
-| `struct` and `enum` tags | `snake_case` is a common C convention | `struct linked_list`, `enum file_mode` |
-| Enumeration constants | `UPPER_CASE` is common, though project styles vary | `FILE_MODE_READ`, `FILE_MODE_WRITE` |
+| Item                     | Common convention                                              | Examples                               |
+| ------------------------ | -------------------------------------------------------------- | -------------------------------------- |
+| Source and header files  | `snake_case` or `flatcase`; choose one and use it consistently | `array_utils.c`, `arrayutils.h`        |
+| Folders                  | `flatcase`                                                     | `src/`, `systemprogramming/`           |
+| Variables                | `snake_case`                                                   | `item_count`, `buffer_size`            |
+| Functions                | `snake_case`                                                   | `read_file()`, `calculate_total()`     |
+| Constants and macros     | `UPPER_CASE`, with underscores between words                   | `MAX_BUFFER_SIZE`, `PI`                |
+| `struct` and `enum` tags | `snake_case` is a common C convention                          | `struct linked_list`, `enum file_mode` |
+| Enumeration constants    | `UPPER_CASE` is common, though project styles vary             | `FILE_MODE_READ`, `FILE_MODE_WRITE`    |
 
 There is no single C standard that mandates `snake_case` for structure or enumeration tags; some projects use `PascalCase` instead. Match the surrounding codebase, and avoid mixing styles without a reason.
 

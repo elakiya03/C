@@ -1,8 +1,14 @@
 #include <stdio.h>
+#include <string.h>
+
 int main()
 {
     char str[] = "elaks hi";
     printf("%s\n", str);
+
+    int length = (int)strlen(str);
+    printf("Length of str: %d\n", length);
+    printf("Array size including '\\0': %d\n", (int)sizeof str);
 
     // first char in str
     printf("%c\n", str[0]);
@@ -12,9 +18,7 @@ int main()
     printf("%s\n", str);
 
     // loop through str
-    int l = sizeof(str) / sizeof(str[0]);
-
-    for (int i = 0; i < l; i++)
+    for (int i = 0; i < length; i++)
     {
         printf("%c", str[i]);
     }
