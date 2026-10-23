@@ -10,7 +10,7 @@ typedef enum
     THUR,
     FRI,
     SAT
-} DAY;
+} days;
 
 int main()
 {
@@ -18,8 +18,8 @@ int main()
     printf("%s", ctime(&now));
 
     struct tm *t = localtime(&now);
-    DAY d = t->tm_wday;
-    switch (d) // Day of week 0=sunday
+    days day = t->tm_wday;
+    switch (day) // Day of week 0=sunday
     {
     case 0:
         printf("Sunday");

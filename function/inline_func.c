@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-inline int add(int x, int y)
+static inline int add(int x, int y)
 {
     return x + y;
 }

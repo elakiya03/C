@@ -13,6 +13,7 @@ int main()
 
     // loop through str
     int l = sizeof(str) / sizeof(str[0]);
+
     for (int i = 0; i < l; i++)
     {
         printf("%c", str[i]);

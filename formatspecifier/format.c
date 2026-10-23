@@ -2,7 +2,7 @@
 
 int main()
 {
-    //constant must be assigned with a value during decalration
+    // constant must be assigned with a value during decalration
     const int BIRTHYEAR = 2001;
 
     int num;

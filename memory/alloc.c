@@ -21,7 +21,7 @@ int main()
         return 1; // Exit the program with an error code
     }
     *ptr2 = 5;
-    *(ptr2 + 1) = 10; // ---> mwthod 2
+    *(ptr2 + 1) = 10; // ---> method 2
     printf("%d\n", *ptr2);
 
     free(ptr1);

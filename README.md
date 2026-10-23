@@ -7,31 +7,33 @@ This guide is a complete C reference for study and practical use. It preserves y
 1. [Introduction to C](#introduction-to-c)
 2. [Basic Syntax and Structure](#basic-syntax-and-structure)
 3. [Compilation and Running](#compilation-and-running)
-4. [Data Types](#data-types)
-5. [Operators and Precedence](#operators-and-precedence)
-6. [Control Structures](#control-structures)
-7. [Type Conversion and Casting](#type-conversion-and-casting)
-8. [Functions](#functions)
-9. [Arrays and Strings](#arrays-and-strings)
-10. [Pointers](#pointers)
-11. [Memory Management](#memory-management)
-12. [Structures, Unions, and Enums](#structures-unions-and-enums)
-13. [Preprocessor and Macros](#preprocessor-and-macros)
-14. [File I/O](#file-io)
-15. [Modular Programming](#modular-programming)
-16. [Storage Classes and Scope](#storage-classes-and-scope)
-17. [Error Types and Debugging](#error-types-and-debugging)
-18. [Advanced C Concepts](#advanced-c-concepts)
-19. [Standard Library and Useful Functions](#standard-library-and-useful-functions)
-20. [C vs C++ Notes](#c-vs-c-notes)
-21. [Quick Reference](#quick-reference)
-22. [Remember When You Return](#remember-when-you-return)
+4. [Input and Output](#input-and-output)
+5. [Data Types](#data-types)
+6. [Operators and Precedence](#operators-and-precedence)
+7. [Control Structures](#control-structures)
+8. [Type Conversion and Casting](#type-conversion-and-casting)
+9. [Functions](#functions)
+10. [Arrays and Strings](#arrays-and-strings)
+11. [Pointers](#pointers)
+12. [Memory Management](#memory-management)
+13. [Structures, Unions, and Enums](#structures-unions-and-enums)
+14. [Preprocessor and Macros](#preprocessor-and-macros)
+15. [File I/O](#file-io)
+16. [Modular Programming](#modular-programming)
+17. [Storage Classes and Scope](#storage-classes-and-scope)
+18. [Error Types and Debugging](#error-types-and-debugging)
+19. [Advanced C Concepts](#advanced-c-concepts)
+20. [Standard Library and Useful Functions](#standard-library-and-useful-functions)
+21. [Naming Conventions](#naming-conventions)
+22. [C vs C++ Notes](#c-vs-c-notes)
+23. [Quick Reference](#quick-reference)
+24. [Remember When You Return](#remember-when-you-return)
 
 ---
 
 ## Introduction to C
 
-C is a procedural programming language designed for systems programming and low-level tasks. It gives you direct control over memory and hardware while remaining efficient and portable.
+C is a `procedural programming language` designed for systems programming and low-level tasks. It gives you direct control over memory and hardware while remaining efficient and portable.
 
 ### Key C Characteristics
 
@@ -99,6 +101,70 @@ int main(void) {
 
 ---
 
+## Input and Output
+
+The `<stdio.h>` header provides standard input and output functions. These functions can be grouped into formatted I/O, which uses format specifiers, and character/string I/O, which reads or writes characters and text directly.
+
+### Formatted I/O
+
+Formatted functions interpret conversion specifiers such as `%d` and `%s`.
+
+#### Formatted output
+
+- `printf(format, ...)` writes formatted output to `stdout`.
+- `fprintf(stream, format, ...)` writes formatted output to a file stream.
+- `sprintf(buffer, format, ...)` writes formatted output to a string buffer; prefer `snprintf` to limit the number of bytes written.
+
+```c
+int score = 95;
+printf("Score: %d\n", score);
+```
+
+#### Formatted input
+
+- `scanf(format, ...)` reads formatted input from `stdin`.
+- `fscanf(stream, format, ...)` reads formatted input from a file stream.
+- `sscanf(string, format, ...)` reads formatted input from a string.
+
+Pass the address of each destination variable (for example, `&age`), except for character arrays used with `%s`. Check the return value to confirm how many items were successfully read.
+
+```c
+int age;
+if (scanf("%d", &age) == 1) {
+    printf("Age: %d\n", age);
+}
+```
+
+Common conversion specifiers include `%d` for `int`, `%u` for `unsigned int`, `%c` for a character, `%s` for a string, `%f` for `float` output, and `%lf` for `double` input. For `printf`, `%f` is used for both `float` and `double` arguments.
+
+### Unformatted I/O (Characters and Strings)
+
+These functions read or write characters and strings without using format strings.
+
+- `getchar()` reads one character from `stdin`
+- `putchar(character)` writes one character to `stdout`.
+
+- `fgetc(stream)` reads one character from a stream
+- `fputc(character, stream)` writes one character.
+
+- `fgets(buffer, size, stream)` reads at most `size - 1` characters and adds a terminating null character when successful. It can retain the newline if one fits.
+- `puts(string)` writes a string to `stdout` and appends a newline.
+- `fputs(string, stream)` writes a string without adding a newline.
+
+- `fread(buffer, size, count, stream)` and `fwrite(buffer, size, count, stream)` read and write blocks of data, commonly for binary files.
+- When using `%s` with `scanf`, specify a maximum field width that leaves room for the terminating null character (for example, `%49s` for a 50-byte array).
+
+```c
+char name[50];
+if (fgets(name, sizeof name, stdin) != NULL) {
+    puts(name);
+}
+```
+
+Avoid `gets()`: it cannot limit input to the destination buffer size and was removed from the C standard.
+
+---
+
 ## Data Types
 
 ### Basic Types
@@ -132,6 +198,38 @@ Typical sizes on modern 64-bit systems:
 - `double` = 8 bytes
 
 Use `sizeof(type)` to verify actual sizes.
+
+### `size_t` for Sizes and Indexes
+
+`size_t` is an unsigned integer type defined by the standard library, suitable for representing the size of any object. Its width is platform-dependent, so it can represent larger object sizes on platforms that support them. It is not guaranteed to be a particular type such as `unsigned int` or `unsigned long long`.
+
+Use `size_t` for object sizes and array indexes, and include `<stddef.h>` when you need its definition directly. The `sizeof` operator and functions such as `strlen()` return `size_t`. Use `%zu` to print a `size_t` value with `printf`.
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+int main(void) {
+    char message[] = "Hello";
+    size_t length = strlen(message);
+
+    for (size_t i = 0; i < length; i++) {
+        printf("Index %zu: %c\n", i, message[i]);
+    }
+
+    size_t array_size = sizeof message;
+    printf("Array size: %zu bytes\n", array_size);
+    return 0;
+}
+```
+
+Because `size_t` is unsigned, decrementing zero wraps to a large positive value. Avoid conditions such as `i >= 0` in a countdown loop. To process an array backwards, test before decrementing and use `i - 1` as the index:
+
+```c
+for (size_t i = length; i > 0; i--) {
+    printf("%c", message[i - 1]);
+}
+```
 
 ### Constants
 
@@ -231,11 +329,86 @@ for (int i = 0; i < 10; i++) {
 }
 ```
 
+####  `for` Loop Patterns
+
+C has one `for` statement form: `for (initialization; condition; update)`. Any of its three expressions can be omitted, and these examples show common ways to use that form:
+
+```c
+// 1. Standard counter loop
+for (int i = 1; i <= 5; i++) {
+    printf("%d ", i);
+}
+
+// 2. Infinite loop; exit when the required condition is met
+for (;;) {
+    if (should_stop) {
+        break;
+    }
+}
+
+// 3. Multiple variables, separated by comma operators
+for (int i = 0, j = 10; i < j; i++, j--) {
+    printf("i: %d, j: %d\n", i, j);
+}
+
+// 4. Initialization and update handled outside the loop header
+int i = 1;
+for (; i <= 3;) {
+    printf("%d ", i);
+    i++;
+}
+
+// 5. Nested loops, often used to visit rows and columns
+for (int row = 0; row < 2; row++) {
+    for (int col = 0; col < 3; col++) {
+        printf("(%d, %d) ", row, col);
+    }
+    printf("\n");
+}
+```
+
+The infinite form has no stopping condition in its header, so it continues until the body exits it (for example, with `break` or `return`). A nested loop is a loop inside another loop, not a different `for` syntax. C does not have a built-in range-based `for-each` loop.
+
 ### Loop Control
 
 - `break` exits the nearest loop or `switch`.
 - `continue` skips to the next iteration.
 - `goto` jumps to a label and should be used sparingly.
+- C does not support labeled `break` or `continue`; these statements affect only the innermost applicable loop.
+
+To leave multiple nested loops at once, one option is `goto` to a label later in the same function. A flag or returning from the function may be clearer in some cases.
+
+```c
+for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+        if (i == 1 && j == 1) {
+            goto loops_done;
+        }
+    }
+}
+
+loops_done:
+printf("Finished the nested loops.\n");
+```
+
+#### `break` vs. `return`
+
+- `break` exits the nearest enclosing loop or `switch`, then execution continues after it.
+- `return` exits the current function immediately, skipping the rest of its body and returning control to its caller. A non-`void` function can return a value.
+
+```c
+void check_numbers(void) {
+    for (int i = 1; i <= 5; i++) {
+        if (i == 3) {
+            break; // Exits the loop; execution continues in this function.
+        }
+        printf("%d ", i);
+    }
+    printf("\nLoop ended; the function is still running.\n");
+}
+```
+
+Use `break` when only the loop should stop; use `return` when the function's work is finished and it should exit.
 
 ### Nested Control Flow
 
@@ -276,15 +449,87 @@ unsigned int u = (unsigned int)x;
 ### Declaration and Definition
 
 ```c
-int add(int a, int b); // declaration
+int add(int a, int b); // declaration (prototype)
 
 int add(int a, int b) {
     return a + b;
 }
 ```
 
-- Declaration tells the compiler about the function.
-- Definition provides the function body.
+- A declaration tells the compiler the function's name, return type, and parameter types.
+- A definition provides the function body. A definition also serves as a declaration.
+- Function definitions are not called “initializations”; initialization gives an object its initial value.
+
+### Function Layouts
+
+The definition can appear before `main`, in which case a separate prototype is not needed:
+
+```c
+int add(int a, int b) {
+    return a + b;
+}
+
+int main(void) {
+    return add(5, 3) == 8 ? 0 : 1;
+}
+```
+
+Alternatively, place a prototype before `main` and the definition later. This is useful when organizing larger source files:
+
+```c
+int add(int a, int b); // Prototype
+
+int main(void) {
+    return add(5, 3) == 8 ? 0 : 1;
+}
+
+int add(int a, int b) { // Definition
+    return a + b;
+}
+```
+
+Parameter names may be omitted from a prototype; only the parameter types are required:
+
+```c
+int add(int, int);
+```
+
+This is still a prototype, not a distinct kind of function definition.
+
+### Function Types by Parameters and Return Value
+
+Functions can be grouped by whether they take parameters and return a value:
+
+```c
+void greet(void);              // No parameters, no return value
+void print_square(int value);  // Parameters, no return value
+int get_answer(void);          // No parameters, returns a value
+int max(int a, int b);         // Parameters and returns a value
+```
+
+For example:
+
+```c
+void greet(void) {
+    printf("Hi\n");
+}
+
+void print_square(int value) {
+    printf("%d\n", value * value);
+}
+
+int get_answer(void) {
+    return 42;
+}
+
+int max(int a, int b) {
+    return a > b ? a : b;
+}
+```
+
+Use `(void)` to explicitly declare that a function takes no parameters, such as `int get_answer(void);`. In C versions before C23, an empty parameter list in a declaration such as `int get_answer();` does not provide a prototype specifying that there are no parameters.
+
+- A function cannot return an array directly. It can return a pointer, but do not return a pointer to a local array because that array's lifetime ends when the function returns.
 
 ### Calling Functions
 
@@ -321,23 +566,42 @@ void func(int *p) {
 
 ### Function Pointers
 
+A function pointer stores the address of a function with a matching return type and parameter types.
+
 ```c
 int add(int a, int b) {
     return a + b;
 }
 
-int (*funcPtr)(int, int) = add;
-printf("%d\n", funcPtr(5, 2));
+int (*func_ptr)(int, int) = add;
+printf("%d\n", func_ptr(5, 2));
 ```
 
-- Useful for callbacks and dynamic behavior.
-- Function pointers are common in C APIs.
+The `&` operator is optional when taking a function's address, and a function pointer can be called like a function:
+
+```c
+int apply(int a, int b, int (*operation)(int, int)) {
+    return operation(a, b);
+}
+
+int result = apply(5, 2, add);
+```
+
+- Function pointers are useful for callbacks, such as passing a comparison function to `qsort`, and for selecting behavior at runtime.
+- The pointed-to function's signature must be compatible with the pointer's type.
 
 ### Inline Functions
 
-- The `inline` keyword suggests that the compiler replace function calls with function body.
-- Use for small functions to reduce call overhead.
-- The compiler may ignore the suggestion.
+In C99 and later, `inline` is a function specifier that permits (but does not require) the compiler to substitute a function's body at a call site. The compiler decides whether to inline it; it may also inline functions without the keyword.
+
+```c
+static inline int square(int value) {
+    return value * value;
+}
+```
+
+- `inline` does not guarantee faster code or eliminate function-call overhead. Measure performance before optimizing.
+- It is most often useful for small functions in headers. `static inline` gives each translation unit its own internal-linkage definition and avoids the external-linkage rules that apply to plain `inline` definitions in C.
 
 ---
 
@@ -346,21 +610,24 @@ printf("%d\n", funcPtr(5, 2));
 ### Arrays
 
 ```c
-int arr[10];
-int arr[] = {1, 2, 3, 4, 5};
-int arr[5] = {1, 2, 3, 4, 5};
+int arr[5];                  // Fixed size; elements are uninitialized
+int a[5] = {1, 2, 3, 4, 5}; // Initialize every element
+int b[] = {1, 2, 3};         // Size is inferred as 3
+int c[5] = {1, 2};           // Remaining elements are initialized to 0
+int d[5] = {0};              // Initialize every element to 0
+int e[] = {0};               // One element, with value 0
 ```
 
-- Arrays have fixed size.
+- A fixed-size array has its size determined at its declaration.
 - The array name decays to a pointer to the first element.
-- Valid indices: `0` to `size-1`.
+- Valid indices: `0` to `size - 1`.
 - Out-of-bounds access is undefined.
 
-Arrays with static storage duration, such as a static array or a file-scope array, are initialized to zero if no explicit initializer is provided. Otherwise, local arrays contain garbage values.
+- Arrays with static storage duration, such as a static array or a file-scope array, are initialized to zero if no explicit initializer is provided. Otherwise, local arrays contain garbage values.
 
-Accessing elements outside of array bounds leads to undefined behaviour. The program may crash, produce garbage values, memory corruption...
+- Accessing elements outside of array bounds leads to undefined behaviour. The program may crash, produce garbage values, memory corruption...
 
-When partially initializing array, the remaining elements are automatically set to zero.
+- When partially initializing array, the remaining elements are automatically set to zero.
 
 ### Multidimensional Arrays
 
@@ -369,7 +636,7 @@ int matrix[3][4];
 ```
 
 - C supports 2D and 3D arrays.
--  Stored in row-major order.
+- Stored in row-major order.
 - Access with `matrix[i][j]`.
 
 ### Passing Arrays to Functions
@@ -527,16 +794,29 @@ int *ip = (int *)p;
 ### Dynamic Allocation
 
 ```c
-int *p = malloc(sizeof(int));
-if (p == NULL) {
-    // handle failure
+int n = 5;
+int *arr = malloc(n * sizeof *arr);
+
+if (arr != NULL) {
+    arr[0] = 42;
+    free(arr);
 }
-*p = 42;
-free(p);
 ```
 
-- `malloc(size)` allocates raw memory.
-- `calloc(count, size)` allocates zero-initialized memory.
+- `malloc(size)` allocates memory whose contents are uninitialized.
+- `calloc(count, size)` allocates memory initialized to zero:
+  ```c
+  int n = 5;
+  int *arr = calloc(n, sizeof *arr);
+  if (arr != NULL) {
+      /* Use arr[0] through arr[n - 1]. */
+      free(arr);
+  }
+  ```
+- Include `<stdlib.h>` to use `malloc`, `calloc`, `realloc`, and `free`.
+- Check allocation results for `NULL` and release allocated memory with `free()` when no longer needed.
+- Use dynamic allocation when the array size is determined at runtime or is too large for automatic storage.
+
 - `realloc(ptr, new_size)` resizes previously allocated memory.
 - `free(ptr)` deallocates memory.
 
@@ -747,6 +1027,16 @@ int main(void) {
 
 - Local `static` variables retain value between calls.
 - Global `static` variables are visible only in the current source file.
+- A local static array has static storage duration and is initialized to zero if no initializer is provided:
+  ```c
+  void example(void) {
+      static int arr[5]; // initialized to zero
+  }
+  ```
+- An array defined at file scope also has static storage duration and is initialized to zero if no initializer is provided:
+  ```c
+  int arr[5]; // global array
+  ```
 
 ### `extern`
 
@@ -810,14 +1100,15 @@ int main(void) {
 
 ### Variable Length Arrays (VLAs)
 
-- Allowed in C99 and optional in later standards.
+- A VLA's size is determined at runtime and its lifetime is limited to its block.
+- Allowed in C99; support is optional in C11 and later, so not every C compiler supports VLAs.
 - Example:
   ```c
-  void foo(int n) {
+  void example(int n) {
       int arr[n];
   }
   ```
-- Use carefully because they allocate on the stack.
+- Use only with a valid positive size, and keep in mind that VLAs are typically allocated on the stack and large ones can exhaust it.
 
 ### Compound Literals
 
@@ -883,6 +1174,24 @@ int main(void) {
 - Prefer `strncpy`/`snprintf` for bounded copies.
 - Use `sizeof` with array names, not pointer variables.
 - Use `calloc` when you need zero-initialized memory.
+
+---
+
+## Naming Conventions
+
+C does not require one naming style for identifiers or files. Follow the conventions already used by a project; when starting a project, choose a consistent style. A common C style is:
+
+| Item | Common convention | Examples |
+|---|---|---|
+| Source and header files | `snake_case` or `flatcase`; choose one and use it consistently | `array_utils.c`, `arrayutils.h` |
+| Folders | `flatcase` | `src/`, `systemprogramming/` |
+| Variables | `snake_case` | `item_count`, `buffer_size` |
+| Functions | `snake_case` | `read_file()`, `calculate_total()` |
+| Constants and macros | `UPPER_CASE`, with underscores between words | `MAX_BUFFER_SIZE`, `PI` |
+| `struct` and `enum` tags | `snake_case` is a common C convention | `struct linked_list`, `enum file_mode` |
+| Enumeration constants | `UPPER_CASE` is common, though project styles vary | `FILE_MODE_READ`, `FILE_MODE_WRITE` |
+
+There is no single C standard that mandates `snake_case` for structure or enumeration tags; some projects use `PascalCase` instead. Match the surrounding codebase, and avoid mixing styles without a reason.
 
 ---
 

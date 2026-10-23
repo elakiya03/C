@@ -18,6 +18,6 @@ int main()
     printf("%d\n", 3 + 3);
 
     // print mix of text and numbers
-    printf("everything will falls into place on %d %s",2016,"year");
+    printf("everything will falls into place on %d %s", 2016, "year");
     return 0;
 }
